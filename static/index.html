@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+
+<head>
+	<title>The Rego Playground</title>
+	<link rel="icon" href="/images/favicon.ico" type="image/ico" />
+	<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+	<script src="https://unpkg.com/htmx.org@1.9.3"
+		integrity="sha384-lVb3Rd/Ca0AxaoZg5sACe8FJKF0tnUgR2Kd7ehUOG5GCcROv5uBIZsOqovBAcWua"
+		crossorigin="anonymous"></script>
+	<script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+	<script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+	<!-- AlpineJS Library -->
+	<script defer src="https://unpkg.com/alpinejs@3.9.0/dist/cdn.min.js"></script>
+	<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+	<script>
+		AOS.init({
+			offset: 50,
+			duration: 800
+		});
+	</script>
+</head>
+
+<body>
+	<h1>Playground</h1>
+	<form id="playground" hx-post="/playground" hx-trigger="submit" hx-target="#response" hx-ext="json-enc">
+		<h2>Input</h2>
+		<div><input type="text" id="input" name="input"></div>
+		<div><button type="submit">Evaluate</button>
+	</form>
+	<h2>Package</h2>
+	<textarea rows="4" cols="50" form="playground" id="package" name="package"></textarea>
+
+	<h2>Response</h2>
+	<div id="response"></div>
+</body>
+
+</html>
