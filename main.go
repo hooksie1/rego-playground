@@ -4,10 +4,11 @@ import (
 	"bytes"
 	_ "embed"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/open-policy-agent/opa/rego"
+	"github.com/open-policy-agent/opa/storage/inmem"
+	"github.com/open-policy-agent/opa/util"
 	//"github.com/tylermmorton/tmpl"
 )
 
@@ -31,25 +32,37 @@ type Request struct {
 func playground(w http.ResponseWriter, r *http.Request) {
 	var req Request
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "bad request", 400)
+		http.Error(w, err.Error(), 200)
 	}
 
 	var input any
 	d := json.NewDecoder(bytes.NewBufferString(req.Input))
 	d.UseNumber()
 	if err := d.Decode(&input); err != nil {
-		fmt.Println(err)
-		http.Error(w, "bad request", 400)
+		http.Error(w, err.Error(), 200)
 		return
 	}
 
-	rego := rego.New(
+	rg := rego.New(
 		rego.Query("data.play"),
 		rego.Module("play.rego", req.Package),
 		rego.Input(input),
 	)
+	if req.Data != "" {
+		var jdata map[string]interface{}
 
-	rs, err := rego.Eval(r.Context())
+		err := util.UnmarshalJSON([]byte(req.Data), &jdata)
+		if err != nil {
+			http.Error(w, err.Error(), 200)
+			return
+		}
+		store := inmem.NewFromObject(jdata)
+		f := rego.Store(store)
+		f(rg)
+
+	}
+
+	rs, err := rg.Eval(r.Context())
 	if err != nil {
 		http.Error(w, err.Error(), 200)
 		return
@@ -59,13 +72,9 @@ func playground(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err := json.Marshal(rs[0].Expressions[0].Value)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	w.Write(data)
-
+	e := json.NewEncoder(w)
+	e.SetIndent("", "  ")
+	e.Encode(rs[0].Expressions[0].Value)
 }
 
 func main() {

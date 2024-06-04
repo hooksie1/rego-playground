@@ -23,9 +23,13 @@
 	<script>
 		function prettify() {
       	var input = document.getElementById('input').value;
-      	var parsed = JSON.parse(input);
-      	var prettified = JSON.stringify(parsed, undefined, 4);
-      	document.getElementById('input').value = prettified;
+		var data = document.getElementById('data').value;
+      	var parsedInput = JSON.parse(input);
+      	var parsedData = JSON.parse(data);
+      	var prettyInput = JSON.stringify(parsedInput, undefined, 4);
+      	var prettyData = JSON.stringify(parsedData, undefined, 4);
+      	document.getElementById('input').value = prettyInput;
+      	document.getElementById('data').value = prettyData;
    }
 	</script>
 </head>
@@ -39,17 +43,19 @@
 			<textarea class="px-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" rows="20" cols="50" form="playground" id="package" name="package"></textarea>
 		</div>
 		<div>
+			<button class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" type="button" onclick="prettify()">Format</button>
+			<button class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" type="submit" form="playground">Evaluate</button>
 			<form id="playground" hx-post="/playground" hx-trigger="submit" hx-target="#response" hx-ext="json-enc">
 				<label for="input" class="block text-md font-medium leading-6 text-gray-900">Input</label>
 				<textarea class="px-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" rows="4" cols="25" form="playground" id="input" name="input"></textarea>
-				<button class="mt-3 inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" type="button" onclick="prettify()">Format</button>
+				<label for="data" class="block text-md font-medium leading-6 text-gray-900">Data</label>
+				<textarea class="px-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" rows="4" cols="25" form="playground" id="data" name="data"></textarea>
 			</form>
+			<div class="mt-4">
+				<h2>Response</h2>
+				<pre><textarea readonly id="response" rows="12" cols="25" class="px-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea></pre>
+			</div>
 		</div>
-	</div>
-	<div class="mx-4 mt-5">
-		<button class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" type="submit" form="playground">Evaluate</button>
-		<h2>Response</h2>
-		<div id="response"></div>
 	</div>
 </div>
 </body>
