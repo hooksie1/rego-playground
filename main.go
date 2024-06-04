@@ -51,7 +51,12 @@ func playground(w http.ResponseWriter, r *http.Request) {
 
 	rs, err := rego.Eval(r.Context())
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		http.Error(w, err.Error(), 200)
+		return
+	}
+	if len(rs) == 0 {
+		http.Error(w, "uh oh", 500)
+		return
 	}
 
 	data, err := json.Marshal(rs[0].Expressions[0].Value)
