@@ -4,6 +4,7 @@ import (
 	"bytes"
 	_ "embed"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/open-policy-agent/opa/rego"
@@ -42,6 +43,7 @@ func playground(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 200)
 		return
 	}
+	fmt.Printf("%+v\n", req)
 
 	rg := rego.New(
 		rego.Query("data.play"),
