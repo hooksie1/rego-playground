@@ -1,0 +1,9 @@
+when:
+  - event: push
+    branch: main
+
+steps:
+  - name: build
+    image: golang:alpine
+    commands:
+      - go test -v ./...
