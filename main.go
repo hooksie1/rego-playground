@@ -18,6 +18,7 @@ import (
 //
 //	IndexTemplate = tmpl.MustCompile(&Index{})
 //)
+// adding comment to test pipeline
 
 type Request struct {
 	Input   string `json:"input"`
