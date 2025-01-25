@@ -1,6 +1,5 @@
 steps:
   - name: build
-    image: golang:alpine
     commands:
       - go test -v ./...
 
