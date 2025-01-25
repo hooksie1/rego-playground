@@ -19,6 +19,7 @@ import (
 //
 //	IndexTemplate = tmpl.MustCompile(&Index{})
 //)
+// adding comment to test
 
 type Request struct {
 	Input   string `json:"input"`
