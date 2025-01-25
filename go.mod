@@ -1,6 +1,6 @@
 module playground
 
-go 1.22.0
+go 1.21.6
 
 require github.com/open-policy-agent/opa v0.65.0
 
