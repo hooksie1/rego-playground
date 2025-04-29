@@ -6,12 +6,9 @@
 	<link rel="stylesheet" href="output.css">
 	<link rel="icon" href="/images/favicon.ico" type="image/ico" />
 	<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.0/codemirror.min.css">
-	<script src="https://unpkg.com/htmx.org@1.9.3"
-		integrity="sha384-lVb3Rd/Ca0AxaoZg5sACe8FJKF0tnUgR2Kd7ehUOG5GCcROv5uBIZsOqovBAcWua"
-		crossorigin="anonymous"></script>
-	<script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
-	<script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
 	<!-- AlpineJS Library -->
 	<script defer src="https://unpkg.com/alpinejs@3.9.0/dist/cdn.min.js"></script>
 	<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
@@ -21,30 +18,17 @@
 			duration: 800
 		});
 	</script>
-	<script>
-		function prettify() {
-			var input = document.getElementById('input').value;
-			var data = document.getElementById('data').value;
-			var parsedInput = JSON.parse(input);
-			var parsedData = JSON.parse(data);
-			var prettyInput = JSON.stringify(parsedInput, undefined, 4);
-			var prettyData = JSON.stringify(parsedData, undefined, 4);
-			document.getElementById('input').value = prettyInput;
-			document.getElementById('data').value = prettyData;
-		}
-	</script>
 	<style>
-		.cm-editor {
+	    .cm-editor {
             height: 100%;
             width: 100%;
-        }
+            }
 	</style>
-	<script src="codemirror.js"></script>
 </head>
 
 <body>
 	<h1>Playground</h1>
-	<div class="container mx-auto"></div>
+	<div class="container mx-auto">
 	<div class="grid grid-cols-2 gap-5 mx-4">
 		<div>
 			<label for="package" class="block text-md font-medium leading-6 text-gray-900">Rego
@@ -64,8 +48,7 @@
 						class="px-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
 				</pre>
 			</div>
-			<form id="playground" hx-post="/playground" hx-trigger="submit" hx-target="#response"
-				hx-ext="json-enc">
+			<form id="playground"> 
 				<label for="input"
 					class="block text-md font-medium leading-6 text-gray-900">Input</label>
 				<textarea
@@ -79,6 +62,69 @@
 		</div>
 	</div>
 	</div>
+	<script>
+	  const editors = {};
+	
+	  function initializeEditors() {
+	    const fields = ['package', 'input', 'data'];
+	    fields.forEach(id => {
+	      const el = document.getElementById(id);
+	      
+	      // Check if CodeMirror has already been initialized
+	      if (!el.classList.contains('cm-initialized')) {
+	        editors[id] = CodeMirror.fromTextArea(el, {
+	          lineNumbers: true,
+	          mode: 'javascript'
+	        });
+	
+	        // Add the 'cm-initialized' class to prevent re-initializing
+	        el.classList.add('cm-initialized');
+	      }
+	    });
+	  }
+	
+	  function prettify() {
+	    try {
+	      const input = JSON.parse(editors.input.getValue());
+	      editors.input.setValue(JSON.stringify(input, null, 2));
+	
+	      const data = JSON.parse(editors.data.getValue());
+	      editors.data.setValue(JSON.stringify(data, null, 2));
+	    } catch (e) {
+	      alert('Invalid JSON in input or data.');
+	    }
+	  }
+	
+	  document.addEventListener('DOMContentLoaded', () => {
+	    initializeEditors();
+	
+	    document.getElementById('playground').addEventListener('submit', async function (e) {
+	      e.preventDefault(); // Prevents page refresh
+	
+	      // Save CodeMirror content back into the hidden <textarea>s
+	      Object.values(editors).forEach(editor => editor.save());
+	
+	      const payload = {
+	        package: document.getElementById('package').value,
+	        input: document.getElementById('input').value,
+	        data: document.getElementById('data').value
+	      };
+	
+	      try {
+	        const res = await fetch('/playground', {
+	          method: 'POST',
+	          headers: { 'Content-Type': 'application/json' },
+	          body: JSON.stringify(payload)
+	        });
+	
+	        const text = await res.text();
+	        document.getElementById('response').value = text;
+	      } catch (err) {
+	        document.getElementById('response').value = 'Error: ' + err.message;
+	      }
+	    });
+	  });
+	</script>
 </body>
 
 </html>
