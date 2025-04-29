@@ -4,7 +4,6 @@ import (
 	"bytes"
 	_ "embed"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/open-policy-agent/opa/rego"
@@ -13,23 +12,11 @@ import (
 	//"github.com/tylermmorton/tmpl"
 )
 
-//var (
-//	//go:embed index.tmpl.html
-//	tmplIndex string
-//
-//	IndexTemplate = tmpl.MustCompile(&Index{})
-//)
-// adding comment to test
-
 type Request struct {
 	Input   string `json:"input"`
 	Data    string `json:"data"`
 	Package string `json:"package"`
 }
-
-//func (*Index) TemplateText() string {
-//	return tmplIndex
-//}
 
 func playground(w http.ResponseWriter, r *http.Request) {
 	var req Request
@@ -44,7 +31,6 @@ func playground(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 200)
 		return
 	}
-	fmt.Printf("%+v\n", req)
 
 	rg := rego.New(
 		rego.Query("data.play"),
