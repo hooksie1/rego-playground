@@ -1,128 +1,93 @@
 <!doctype html>
 <html>
+    <head>
+        <title>The Rego Playground</title>
+        <link rel="stylesheet" href="output.css" />
+        <link rel="icon" href="/images/favicon.ico" type="image/ico" />
+        <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css"
+        />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+        <script src="rego-modebetter.js"></script>
+        <script src="index.js"></script>
+        <link rel="stylesheet" href="custom.css" />
+    </head>
 
-<head>
-	<title>The Rego Playground</title>
-	<link rel="stylesheet" href="output.css">
-	<link rel="icon" href="/images/favicon.ico" type="image/ico" />
-	<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
-	<!-- AlpineJS Library -->
-	<script defer src="https://unpkg.com/alpinejs@3.9.0/dist/cdn.min.js"></script>
-	<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-	<script>
-		AOS.init({
-			offset: 50,
-			duration: 800
-		});
-	</script>
-	<style>
-	    .cm-editor {
-            height: 10%;
-            width: 10%;
-            }
-	</style>
-</head>
-
-<body>
-	<h1>Playground</h1>
-	<div class="container mx-auto">
-	<div class="grid grid-cols-2 gap-5 mx-4">
-		<div>
-			<label for="package" class="block text-md font-medium leading-6 text-gray-900">Rego
-				Package</label>
-			<textarea
-				class="px-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-				rows="20" cols="50" form="playground" id="package" name="package"></textarea>
-		</div>
-		<div>
-			<button class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-				type="button" onclick="prettify()">Format</button>
-			<button class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-				type="submit" form="playground">Evaluate</button>
-			<div class="mt-4">
-				<h2>Response</h2>
-				<pre><textarea readonly id="response" rows="12" cols="25"
+    <body>
+        <h1>Rego Playground</h1>
+        <div class="container mx-auto">
+            <div class="grid grid-cols-2 gap-5 mx-4">
+                <div>
+                    <label
+                        for="package"
+                        class="block text-md font-medium leading-6 text-gray-900"
+                        >Rego Package</label
+                    >
+                    <textarea
+                        class="px-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        rows="20"
+                        cols="50"
+                        form="playground"
+                        id="package"
+                        name="package"
+                    ></textarea>
+                </div>
+                <div>
+                    <button
+                        class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                        type="button"
+                        id="format"
+                    >
+                        Format
+                    </button>
+                    <button
+                        class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                        type="submit"
+                        form="playground"
+                    >
+                        Evaluate
+                    </button>
+                    <div class="mt-4">
+                        <h2>Response</h2>
+                        <pre><textarea readonly id="response" rows="12" cols="25"
 						class="px-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
 				</pre>
-			</div>
-			<form id="playground" method="POST"> 
-				<label for="input"
-					class="block text-md font-medium leading-6 text-gray-900">Input</label>
-				<textarea
-					rows="4" cols="25" form="playground" id="input" name="input"></textarea>
-				<label for="data" class="block text-md font-medium leading-6 text-gray-900">Data</label>
-				<textarea
-					rows="4" cols="25" form="playground" id="data" name="data"></textarea>
-			</form>
-		</div>
-	</div>
-	</div>
-	<script>
-	  const editors = {};
-	
-	  function initializeEditors() {
-	    const fields = ['package', 'input', 'data'];
-	    fields.forEach(id => {
-	      const el = document.getElementById(id);
-	      
-	      // Check if CodeMirror has already been initialized
-	      if (!el.classList.contains('cm-initialized')) {
-	        editors[id] = CodeMirror.fromTextArea(el, {
-	          lineNumbers: true,
-	          mode: 'javascript'
-	        });
-	
-	        // Add the 'cm-initialized' class to prevent re-initializing
-	        el.classList.add('cm-initialized');
-	      }
-	    });
-	  }
-	
-	  function prettify() {
-	    try {
-	      const input = JSON.parse(editors.input.getValue());
-	      editors.input.setValue(JSON.stringify(input, null, 2));
-	
-	      const data = JSON.parse(editors.data.getValue());
-	      editors.data.setValue(JSON.stringify(data, null, 2));
-	    } catch (e) {
-	      alert('Invalid JSON in input or data.');
-	    }
-	  }
-	
-	  document.addEventListener('DOMContentLoaded', () => {
-	    initializeEditors();
-	
-	    document.getElementById('playground').addEventListener('submit', async function (e) {
-	      e.preventDefault(); // Prevents page refresh
-	
-	      // Save CodeMirror content back into the hidden <textarea>s
-	      Object.values(editors).forEach(editor => editor.save());
-	
-	      const payload = {
-	        package: document.getElementById('package').value,
-	        input: document.getElementById('input').value,
-	        data: document.getElementById('data').value
-	      };
-	
-	      try {
-	        const res = await fetch('/playground', {
-	          method: 'POST',
-	          headers: { 'Content-Type': 'application/json' },
-	          body: JSON.stringify(payload)
-	        });
-	
-	        const text = await res.text();
-	        document.getElementById('response').value = text;
-	      } catch (err) {
-	        document.getElementById('response').value = 'Error: ' + err.message;
-	      }
-	    });
-	  });
-	</script>
-</body>
-
+                    </div>
+                    <form id="playground" method="POST">
+                        <label
+                            for="input"
+                            class="block text-md font-medium leading-6 text-gray-900"
+                            >Input</label
+                        >
+                        <textarea
+                            rows="4"
+                            cols="25"
+                            form="playground"
+                            id="input"
+                            name="input"
+                        >
+                            {}</textarea
+                        >
+                        <label
+                            for="data"
+                            class="block text-md font-medium leading-6 text-gray-900"
+                            >Data</label
+                        >
+                        <textarea
+                            rows="4"
+                            cols="25"
+                            form="playground"
+                            id="data"
+                            name="data"
+                        >
+                            {}</textarea
+                        >
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
 </html>

@@ -57,7 +57,7 @@ func playground(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if len(rs) == 0 {
-		http.Error(w, "uh oh", 500)
+		http.Error(w, "something is really wrong", 500)
 		return
 	}
 
