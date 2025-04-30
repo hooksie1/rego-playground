@@ -12,25 +12,12 @@ import (
 	//"github.com/tylermmorton/tmpl"
 )
 
-//var (
-//	//go:embed index.tmpl.html
-//	tmplIndex string
-//
-//	IndexTemplate = tmpl.MustCompile(&Index{})
-//)
-// adding comment to test pipeline
-// adding comment to test pipeline
-// adding comment to test pipeline
 
 type Request struct {
 	Input   string `json:"input"`
 	Data    string `json:"data"`
 	Package string `json:"package"`
 }
-
-//func (*Index) TemplateText() string {
-//	return tmplIndex
-//}
 
 func playground(w http.ResponseWriter, r *http.Request) {
 	var req Request
@@ -71,7 +58,7 @@ func playground(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if len(rs) == 0 {
-		http.Error(w, "uh oh", 500)
+		http.Error(w, "something is really wrong", 500)
 		return
 	}
 
