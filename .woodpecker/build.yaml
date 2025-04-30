@@ -1,0 +1,10 @@
+when:
+  - event: push
+    branch: main
+  - event: manual
+steps:
+  - name: build
+    image: golang
+    commands:
+      - go test -v ./...
+

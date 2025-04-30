@@ -12,6 +12,7 @@ import (
 	//"github.com/tylermmorton/tmpl"
 )
 
+
 type Request struct {
 	Input   string `json:"input"`
 	Data    string `json:"data"`
