@@ -10,6 +10,10 @@
     overflow: auto !important;
 }
 
+#package + .CodeMirror {
+    height: 70% !important;
+}
+
 .resize-handle {
     height: 10px;
     background: #f0f0f0;
