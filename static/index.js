@@ -15,7 +15,7 @@ function initializeEditors() {
   editors.input = CodeMirror.fromTextArea(document.getElementById("input"), {
     mode: "application/json",
     lineNumbers: true,
-    theme: "default",
+ theme: "default",
     autoCloseBrackets: true,
     matchBrackets: true,
   });
@@ -69,25 +69,12 @@ document.addEventListener("DOMContentLoaded", () => {
         editor.save();
       });
 
-      const payload = {
-        package: document.getElementById("package").value,
-        input: document.getElementById("input").value,
-        data: document.getElementById("data").value,
-      };
+      const response = evalRego(
+        document.getElementById("input").value,
+        document.getElementById("data").value,
+        document.getElementById("package").value,
+      );
 
-      try {
-        const response = await fetch("/playground", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
-
-        const text = await response.text();
-        document.getElementById("response").value = text;
-      } catch (err) {
-        document.getElementById("response").value = "Error: " + err.message;
-      }
+      document.getElementById("response").value = JSON.stringify(JSON.parse(response), null, 2);
     });
 });
