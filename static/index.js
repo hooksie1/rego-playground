@@ -30,7 +30,8 @@ function initializeEditors() {
 
   // Set sizes
   Object.values(editors).forEach((editor) => {
-    editor.setSize("100%", "200px");
+    let height = (editor.options.mode === 'rego') ? "75%" : "200px";
+    editor.setSize("100%", height);
   });
 }
 

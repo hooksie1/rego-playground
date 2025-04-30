@@ -7,11 +7,12 @@
     border: 1px solid #ddd;
     height: 200px;
     resize: vertical;
-    overflow: auto !important;
 }
 
-#package + .CodeMirror {
+.Package {
     height: 70% !important;
+    border: 1px solid #ddd;
+    resize: vertical;
 }
 
 .resize-handle {

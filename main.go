@@ -12,7 +12,6 @@ import (
 	//"github.com/tylermmorton/tmpl"
 )
 
-
 type Request struct {
 	Input   string `json:"input"`
 	Data    string `json:"data"`
@@ -39,7 +38,7 @@ func playground(w http.ResponseWriter, r *http.Request) {
 		rego.Input(input),
 	)
 	if req.Data != "" {
-		var jdata map[string]interface{}
+		var jdata map[string]any
 
 		err := util.UnmarshalJSON([]byte(req.Data), &jdata)
 		if err != nil {
