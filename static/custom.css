@@ -13,6 +13,7 @@
     height: 70% !important;
     border: 1px solid #ddd;
     resize: vertical;
+    overflow: auto !important;
 }
 
 .resize-handle {

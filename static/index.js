@@ -1,5 +1,23 @@
 let editors = {};
 
+function syncEditorHeights() {
+  const ids = ["input", "data", "response"];
+  const editors = ids.map(id => document.getElementById(id));
+
+  editors.forEach((editor, _, all) => {
+    editor.addEventListener("input", () => {
+      const height = editor.offsetHeight;
+      all.forEach((e) => {
+        if (e !== editor) e.style.height = `${height}px`;
+      });
+    });
+  });
+}
+
+// Call it after DOM is ready
+document.addEventListener("DOMContentLoaded", syncEditorHeights);
+
+
 function initializeEditors() {
   // Initialize Rego editor
   editors.package = CodeMirror.fromTextArea(document.getElementById("package"), {
@@ -94,16 +112,16 @@ function init() {
     document.getElementById("format").addEventListener("click", formatJSON);
   
     // Add form submit handler
-    document.getElementById("playground").addEventListener("submit", async (e) => {
+    document.getElementById("evaluate").addEventListener("click", async (e) => {
         e.preventDefault();
   
         saveEditorContent();
         compressAndUpdateURL()
   
         const response = evalRego(
-          document.getElementById("input").value,
-          document.getElementById("data").value,
-          document.getElementById("package").value,
+          editors.input.getValue(),
+          editors.data.getValue(),
+          editors.package.getValue()
         );
 
 
