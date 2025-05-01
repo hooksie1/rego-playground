@@ -29,11 +29,11 @@ func compressWrapper() js.Func {
 		bout := &bytes.Buffer{}
 		zwtr, err := flate.NewWriter(bout, flate.BestCompression)
 		if err != nil {
-			return err
+			return err.Error()
 		}
 		_, err = io.Copy(zwtr, buff)
 		if err != nil {
-			return err
+			return err.Error()
 		}
 
 		zwtr.Close()
@@ -118,8 +118,8 @@ func regoWrapper() js.Func {
 		pkg := args[2].String()
 		pretty, err := evalRego(inputJSON, dataJSON, pkg)
 		if err != nil {
-			fmt.Printf("unable to convert to json %s\n", err)
-			return err.Error()
+			fmt.Println(err)
+			return err
 		}
 		return pretty
 	})

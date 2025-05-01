@@ -124,7 +124,13 @@ function init() {
           editors.package.getValue()
         );
 
-
-        document.getElementById("response").value = JSON.stringify(JSON.parse(response), null, 2);
+        let jsonResp;
+        try {
+          jsonResp = JSON.parse(response); 
+          document.getElementById("response").value = JSON.stringify(jsonResp, null, 2);
+        } catch (e) {
+          console.error(e);
+          document.getElementById("response").value = response;
+        }
       });
 }
