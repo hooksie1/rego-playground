@@ -2,7 +2,7 @@ let editors = {};
 
 function initializeEditors() {
   // Initialize Rego editor
-  editors.rego = CodeMirror.fromTextArea(document.getElementById("package"), {
+  editors.package = CodeMirror.fromTextArea(document.getElementById("package"), {
     mode: "rego",
     lineNumbers: true,
     theme: "default",
@@ -35,6 +35,7 @@ function initializeEditors() {
   });
 }
 
+
 function formatJSON() {
   try {
     ["input", "data"].forEach((id) => {
@@ -51,30 +52,61 @@ function formatJSON() {
   }
 }
 
-// Initialize when the DOM is ready
-document.addEventListener("DOMContentLoaded", () => {
-  initializeEditors();
+function saveEditorContent() {
+  Object.entries(editors).forEach(([id, editor]) => {
+    editor.save();
+  });
+}
 
-  // Add format button handler
-  document.getElementById("format").addEventListener("click", formatJSON);
+function hydrate() {
+  const parser = new URL(window.location.href);
+  let m = new Map(Object.entries(editors));
+  parser.searchParams.forEach((val, param) => {
+    if (editors[param]) {
+      editors[param].setValue(decompressData(val))
+    }
+  });
+}
 
-  // Add form submit handler
-  document
-    .getElementById("playground")
-    .addEventListener("submit", async (e) => {
-      e.preventDefault();
+function updateSearchParams(params) {
+  const url = new URL(window.location.href);
+  Object.entries(params).forEach(([key, value]) => {
+    url.searchParams.set(key, value);
+  })
 
-      // Save editor contents back to textareas
-      Object.entries(editors).forEach(([id, editor]) => {
-        editor.save();
+  history.replaceState(null, '', url);
+}
+
+function compressAndUpdateURL() {
+  const params = {};
+  Object.entries(editors).forEach(([id, editor]) => {
+    params[id] = compressData(editor.getValue());
+  })
+  updateSearchParams(params);
+}
+
+
+function init() {
+    initializeEditors();
+    hydrate();
+  
+    // Add format button handler
+    document.getElementById("format").addEventListener("click", formatJSON);
+  
+    // Add form submit handler
+    document.getElementById("playground").addEventListener("submit", async (e) => {
+        e.preventDefault();
+  
+        saveEditorContent();
+        compressAndUpdateURL()
+  
+        const response = evalRego(
+          document.getElementById("input").value,
+          document.getElementById("data").value,
+          document.getElementById("package").value,
+        );
+
+
+        document.getElementById("response").value = JSON.stringify(JSON.parse(response), null, 2);
       });
-
-      const response = evalRego(
-        document.getElementById("input").value,
-        document.getElementById("data").value,
-        document.getElementById("package").value,
-      );
-
-      document.getElementById("response").value = JSON.stringify(JSON.parse(response), null, 2);
-    });
-});
+}

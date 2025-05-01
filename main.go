@@ -2,10 +2,13 @@ package main
 
 import (
 	"bytes"
+	"compress/flate"
 	"context"
 	_ "embed"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"syscall/js"
 
 	"github.com/open-policy-agent/opa/rego"
@@ -13,6 +16,85 @@ import (
 	"github.com/open-policy-agent/opa/util"
 	//"github.com/tylermmorton/tmpl"
 )
+
+//func things() {
+//
+//	a := "policy"
+//	b := base64.URLEncoding.EncodeToString([]byte(a))
+//	buff := bytes.NewBuffer([]byte(b))
+//
+//	bout := &bytes.Buffer{}
+//	zwtr, err := flate.NewWriter(bout, flate.BestCompression)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	_, err = io.Copy(zwtr, buff)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//
+//	zwtr.Close()
+//	new := base64.URLEncoding.EncodeToString(bout.Bytes())
+//	fmt.Println(new)
+//
+//	old, err := base64.URLEncoding.DecodeString(new)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	bin := bytes.NewBuffer(old)
+//	zrdr := flate.NewReader(bin)
+//	io.Copy(os.Stdout, zrdr)
+//}
+
+func compressWrapper() js.Func {
+	return js.FuncOf(func(this js.Value, args []js.Value) any {
+		if len(args) == 0 {
+			return "Argument required"
+		}
+		data := args[0].String()
+		b := base64.URLEncoding.EncodeToString([]byte(data))
+		buff := bytes.NewBuffer([]byte(b))
+
+		bout := &bytes.Buffer{}
+		zwtr, err := flate.NewWriter(bout, flate.BestCompression)
+		if err != nil {
+			return err
+		}
+		_, err = io.Copy(zwtr, buff)
+		if err != nil {
+			return err
+		}
+
+		zwtr.Close()
+		resp := base64.URLEncoding.EncodeToString(bout.Bytes())
+		return resp
+	})
+}
+
+func decompressWrapper() js.Func {
+	return js.FuncOf(func(this js.Value, args []js.Value) any {
+		if len(args) == 0 {
+			return "Argument required"
+		}
+		data := args[0].String()
+		old, err := base64.URLEncoding.DecodeString(data)
+		if err != nil {
+			return err.Error()
+		}
+		bin := bytes.NewBuffer(old)
+		zrdr := flate.NewReader(bin)
+		buf := bytes.Buffer{}
+		_, err = io.Copy(&buf, zrdr)
+		if err != nil {
+			return err.Error()
+		}
+		l, err := base64.URLEncoding.DecodeString(buf.String())
+		if err != nil {
+			return err.Error()
+		}
+		return string(l)
+	})
+}
 
 func evalRego(input, data, pkg string) (string, error) {
 	var in any
@@ -75,6 +157,8 @@ func regoWrapper() js.Func {
 
 func main() {
 	js.Global().Set("evalRego", regoWrapper())
+	js.Global().Set("decompressData", decompressWrapper())
+	js.Global().Set("compressData", compressWrapper())
 	fmt.Println("playground loaded")
 	<-make(chan struct{})
 }
