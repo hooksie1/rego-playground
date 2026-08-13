@@ -69,7 +69,7 @@ func playgrounds(w http.ResponseWriter, r *http.Request) {
 func main() {
 	r := http.NewServeMux()
 
-	r.Handle("POST /playground", http.HandlerFunc(playgrounds))
+	r.Handle("POST /playgrounds", http.HandlerFunc(playgrounds))
 	r.Handle("/", http.FileServer(http.Dir("static")))
 
 	http.ListenAndServe(":8080", r)
