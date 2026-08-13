@@ -72,6 +72,7 @@ func main() {
 	r.Handle("/whoa", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){w.Write([]byte("Hello"))}))
 	r.Handle("POST /playgrounds", http.HandlerFunc(playgrounds))
 	r.Handle("/", http.FileServer(http.Dir("static")))
+	r.Handle("/test", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.Write([]byte("hey")) }))
 
 	http.ListenAndServe(":8080", r)
 
