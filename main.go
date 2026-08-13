@@ -69,6 +69,7 @@ func playgrounds(w http.ResponseWriter, r *http.Request) {
 func main() {
 	r := http.NewServeMux()
 
+	r.Handle("/whoa", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){w.Write([]byte("Hello"))}))
 	r.Handle("POST /playgrounds", http.HandlerFunc(playgrounds))
 	r.Handle("/", http.FileServer(http.Dir("static")))
 
