@@ -15,10 +15,10 @@ import (
 type Request struct {
 	Input   string `json:"input"`
 	Data    string `json:"data"`
-	Package string `json:"package"`
-}
+	Package string `json:"package"`}
 
 func playgrounds(w http.ResponseWriter, r *http.Request) {
+	// something here
 	var req Request
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), 200)
