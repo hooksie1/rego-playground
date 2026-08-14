@@ -13,10 +13,11 @@ import (
 )
 
 type Request struct {
-	Input   string `json:"input"`
-	Data    string `json:"data"`
-	Foo     string `json:"whoa"`
-	Package string `json:"package"`
+	Input     string `json:"input"`
+	Data      string `json:"data"`
+	Foo       string `json:"whoa"`
+	Package   string `json:"package"`
+	Something string `json:"something"`
 }
 
 func playgrounds(w http.ResponseWriter, r *http.Request) {
